@@ -1,4 +1,9 @@
-from app.service.protocols import UserServiceProtocol,  PasswordHasherProtocol, TokenServiceProtocol
+from app.service.protocols import (
+	PasswordHasherProtocol,
+	TokenServiceProtocol,
+	UserServiceProtocol,
+)
+
 
 class InvalidCredentialsError(Exception):
 	pass
@@ -42,8 +47,25 @@ class AuthService[CanHash: PasswordHasherProtocol, UserService: UserServiceProto
 
 		return self._token.create_access_token(data=payload)
 
+	async def process_google_login(self, data : dict) -> str:
+		user_mail = data['email']
 
+		user = await self.user_serv.find_by_mail(user_mail)
 
+		if user is None:
+			print("USER NOT FOUND - CREATING...")
+			email = data['email']
+			name_parts = data.get('name', '').split()
+			name = name_parts[0] if name_parts else ''
+			lastname = name_parts[1] if len(name_parts) > 1 else ''
+			password = self._hasher.generate_random_password()
+			data = {'name': name, 'lastname': lastname,'email': email, 'password': password}
+
+			user = await self.user_serv.create_user(data)
+			print("CREATE DATA:", data)
+		payload = {"sub": str(user.id)}
+		access_token = self._token.create_access_token(data=payload)
+		return access_token
 
 
 

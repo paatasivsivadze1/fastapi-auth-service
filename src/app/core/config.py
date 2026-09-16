@@ -18,11 +18,14 @@ class Settings(BaseSettings):
 	ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
 	SECRET_KEY: SecretStr
-
+	SECRET_KEY_FOR_OAUTH:SecretStr
 	DB_PARAMS: str
 	DB_NAME: str = 'test.db'
-
 	DB_URI: str | None  = None
+
+	GOOGLE_CLIENT_ID: SecretStr
+	GOOGLE_CLIENT_SECRET :SecretStr
+	GOOGLE_REDIRECT_URI: SecretStr
 
 	@model_validator(mode='after')
 	def create_db_uri(self):
