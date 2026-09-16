@@ -1,9 +1,10 @@
-from fastapi import FastAPI
 
 import app.api as routes
-import app.models  #noqa
+import app.models
 from app.core.database import AsyncDB, db
-
+from fastapi import FastAPI
+from starlette.middleware.sessions import SessionMiddleware
+from app.core.config import settings
 
 class MainApp:
     def __init__(self, db: AsyncDB):
@@ -12,9 +13,14 @@ class MainApp:
 
 app_fastapi = MainApp(db).app
 
+
+app_fastapi.add_middleware(
+    SessionMiddleware,
+    secret_key=settings.SECRET_KEY_FOR_OAUTH.get_secret_value(),
+    https_only=False,
+    same_site="lax"
+)
 app_fastapi.include_router(routes.routers)
-
-
 
 def main():
     import uvicorn

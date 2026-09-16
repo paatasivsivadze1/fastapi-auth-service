@@ -1,6 +1,7 @@
-from typing import Protocol
-from pydantic import BaseModel
 from datetime import timedelta
+from typing import Protocol
+
+from pydantic import BaseModel
 
 
 class PasswordHasherProtocol(Protocol):
@@ -13,6 +14,9 @@ class PasswordHasherProtocol(Protocol):
 	def verify_password(cls, password: str, hashed_password: str) -> bool:
 		pass
 
+	@classmethod
+	def generate_random_password(cls) -> str:
+		pass
 
 class UserServiceProtocol(Protocol):
 
@@ -22,6 +26,8 @@ class UserServiceProtocol(Protocol):
 	async def select_one(self, id_: int) -> type[BaseModel] | None:
 		pass
 
+	async def create_user(self, data: dict):
+		pass
 
 class TokenServiceProtocol(Protocol):
 
@@ -32,3 +38,5 @@ class TokenServiceProtocol(Protocol):
 	@staticmethod
 	def verify_token(token: str) -> dict | bool:
 		pass
+
+

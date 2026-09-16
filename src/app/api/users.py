@@ -1,13 +1,12 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
-from fastapi import Query
+from fastapi import APIRouter, Query, status,Depends
 from starlette.exceptions import HTTPException
 
-from app.schemas.api.user_post_common import UserResponseWithPostId
-from app.schemas.api.users import UserCreate, UserResponseWithId, UserUpdate
 from app.api.dependencies import UService
-
+from app.schemas.api.user_post_common import UserResponseWithPostId
+from app.schemas.api.users import UserCreate, UserResponseWithId, UserUpdate,UserResponse
+from app.api.dependencies import CurrenU,CurrentUId
 router = APIRouter()
 
 
@@ -45,3 +44,13 @@ async def update_user(u_id: int, user_serv: UService, data: UserUpdate):
     to_update = data.model_dump(exclude_unset=True)
 
     return await user_serv.update(u_id, to_update)
+
+@router.get("/me", status_code=status.HTTP_200_OK)
+async def get_cuser(current_user:  CurrenU):
+    return current_user
+
+# @router.get(path='/{u_id}/post', response_model=UserResponseWithPostId)
+# async def get_user_with_posts(u_id: int, curr_id: CurrentUId, user_serv: UService):
+#     if u_id != curr_id:
+#         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+#     return await user_serv.get_user(u_id, relationships=True)

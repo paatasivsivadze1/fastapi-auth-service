@@ -1,8 +1,8 @@
-from app.specification.users import UserLoadSpecification, UsersWhereSpecification
 from app.repository.users import UserRepository
 from app.schemas.services.user_post_common import UserPostServiceSchema
 from app.service.base import BaseService
 from app.service.protocols import PasswordHasherProtocol
+from app.specification.users import UserLoadSpecification, UsersWhereSpecification
 
 
 class UserService[Repo: UserRepository, CanHash: PasswordHasherProtocol](BaseService):
@@ -21,11 +21,10 @@ class UserService[Repo: UserRepository, CanHash: PasswordHasherProtocol](BaseSer
 
 	async def create_user(self, data: dict) -> PSchema:
 
-		password = data.pop('password')
-
-		hashed_password = self._hasher.hash_password(password)
-
-		data['hashed_password'] = hashed_password
+		password = data.pop('password',None)
+		if password:
+			hashed_password = self._hasher.hash_password(password)
+			data['hashed_password'] = hashed_password
 
 		return await self.create(data)
 
